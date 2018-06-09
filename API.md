@@ -113,8 +113,8 @@ remote: Total 2222 (delta 0), reused 0 (delta 0), pack-reused 2222
 | text  |ID-필터링할 텍스트 셋|             (예시 입력 참고)             |
 
 **출력**  
-필터에 걸린 텍스트만 id, 텍스트 쌍을 출력한다.  
-단, 텍스트는 (문자열 또는 문자열의 배열)의 배열로 출력하며, 필터에 걸린 텍스트는 배열에 싸는 것으로 한다.
+필터에 걸린 텍스트만 id, 범위의 배열 쌍을 출력한다.  
+범위는 정수로 된 배열로 출력한다.
 
 **처리**  
  * 명시된 필터 목록에 텍스트를 차례로 통과시킨다.  
@@ -136,7 +136,7 @@ remote: Total 2222 (delta 0), reused 0 (delta 0), pack-reused 2222
     ],
 
     [
-      ["miszehbrgbk", "What the fuck asdf"]
+      ["miszehbrgbk", "What the fuck asdf f***"]
     ]
   ]
 }
@@ -145,6 +145,6 @@ remote: Total 2222 (delta 0), reused 0 (delta 0), pack-reused 2222
 **예시 출력**
 ```json
 [
-  ["miszehbrgbk", ["What", "the", ["fuck"], "asdf"]]
+  ["miszehbrgbk", [ [9, 13], [19, 23] ]]
 ]
 ```
