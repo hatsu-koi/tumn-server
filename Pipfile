@@ -5,10 +5,9 @@ name = "pypi"
 
 [packages]
 flask = "*"
-flask-pymongo = "*"
 flask-restful = "*"
 flask-cors = "*"
-gunicorn = "*"
+gitpython = "*"
 
 [dev-packages]
 
