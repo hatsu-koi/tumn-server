@@ -52,10 +52,10 @@ class FilterSet:
     @classmethod
     def read_metadata(cls, path):
         try:
-            with open(os.path.join(path, 'filter.json')) as f:
+            with open(os.path.join(path, 'filterset.json')) as f:
                 return json.load(f)
         except FileNotFoundError:
-            print('filter.json not found in {}'.format(path))
+            print('filterset.json not found in {}'.format(path))
 
     @classmethod
     def load_filters(cls):

@@ -1,10 +1,12 @@
 # API Reference 1.0
 at `localhost:5000`
 
+모든 요청 및 응답의 MIME 타입은 항상 `application/json` 입니다.
+
 ---
 
 # Filters API
-## GET `/filter`
+## GET `/filterset/`
 **설명**
 현재 설치된 필터셋 목록 출력
 
@@ -24,8 +26,8 @@ at `localhost:5000`
       "author": "Tumn Developers",
       "description": "FilterSet related to things",
       "source": {
-        "href": "https://github.com/hatsu-koi/tumn-filter",
-        "text": "https://github.com/hatsu-koi/tumn-filter"
+        "href": "filterset",
+        "text": "filterset"
       }
     },
     "options": [
@@ -55,7 +57,7 @@ at `localhost:5000`
 ```
 
 
-## POST `/filter`
+## POST `/filterset/`
 **설명**
 새로운 필터셋을 URL로부터 설치  
 
@@ -63,13 +65,18 @@ at `localhost:5000`
 
 |  키  |  타입  |     설명     |                  예시                   |
 |------|--------|--------------|----------------------------------------|
-|`filter`| `String` |  설치할 주소  |`"https://github.com/hatsu-koi/tumn-filter"`|
+|`url`| `String` |  설치할 주소  |`"https://github.com/hatsu-koi/tumn-filter"`|
+
+**출력 파라미터**
+|  키  |  타입  |     설명     |                  예시                   |
+|------|--------|--------------|----------------------------------------|
+|`id`|`String`|설치중인 필터의 id | `"default"` |
 
 **처리**
-1. 필터 폴더에 Git 레포지토리를 클론한다.  
-2. 필터 폴더 내부의 setup.py를 실행시킨다.  
+1. 필터 폴더에 Git 레포지토리를 클론한다.
+2. 필터 폴더 내부의 setup.py를 실행시킨다.
 
-## GET `/filter/:url`
+## GET `/filters/:id/messsages`
 **설명**
 해당하는 설치중인 필터셋들의 로그를 출력한다.
 
@@ -86,7 +93,7 @@ at `localhost:5000`
 }
 ```
 
-## DELETE `/filter/:id`
+## DELETE `/filterset/:id/`
 **설명**  
 존재하는 필터셋을 삭제
 
