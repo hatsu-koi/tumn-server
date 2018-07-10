@@ -2,13 +2,15 @@ from git import Repo, RemoteProgress
 from tumn.utils.database import Database
 import os
 import json
-import queue
+import shutil
 
 FILTERS_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../filters/'))
 
 
 class FilterSet:
     __slots__ = ['name', 'path', 'meta', 'isLoaded', 'message_queue', 'filters']
+    filterset_store = Database()
+    message_queue = []
 
     def __init__(self, name):
         self.name = name
@@ -23,27 +25,28 @@ class FilterSet:
         if not self.meta:
             return
 
-        filterset_store.iterload([self.name, self.path, self.meta['id']], [self])
-        message_queue_store.iterload([self.name, self.meta['information']['source']['href']], [queue.Queue()])
+        FilterSet.filterset_store.iterload([self.name, self.path, self.meta['id']], [self])
 
         for f in self.meta['options']:
-            self.filters[f['id']] = Filter(id_=f['id'], name=f['name'],
-                                           description=f['description'], tfsession=None)
+            self.filters[f['id']] = Filter(id_=f['id'],
+                                           name=f['name'],
+                                           description=f['description'],
+                                           predict=None)
 
-        message_queue_store[self.name].put('Filter loaded successful.')
+        FilterSet.message_queue.append('Filter loaded successful.')
 
         self.isLoaded = True
 
     @classmethod
-    def download_filter(cls, url, q):
+    def download_filter(cls, url):
         name = os.path.basename(url).replace('.git', '')
 
         class Progress(RemoteProgress):
             def update(self, op_code, cur_count, max_count=None, message=''):
-                q.put(self._cur_line)
+                cls.message_queue.append(self._cur_line)
 
-        q.put('Downloading Filterset...')
-        q.put('FilterSet detected : {}'.format(name))
+        cls.message_queue.append('Downloading Filterset...\n'
+                                 'FilterSet detected : {}'.format(name))
 
         return Repo.clone_from(url,
                                os.path.join('tumn/filters', name),
@@ -68,19 +71,35 @@ class FilterSet:
         return [os.path.join(os.path.abspath(os.path.join(os.path.dirname(__file__), '../filters/')), d)
                 for d in os.listdir(FILTERS_PATH) if os.path.isdir(os.path.join(FILTERS_PATH, d))]
 
+    @classmethod
+    def find_filterset(cls, arg):
+        try:
+            return cls.filterset_store[arg]
+        except KeyError:
+            return None
+
+    @classmethod
+    def delete_filterset(cls, id_):
+        path = FilterSet.find_filterset(id_).path
+        shutil.rmtree(path)
+        del cls.filterset_store[id_]
+
+    @classmethod
+    def pop_messages(cls):
+        copy = cls.message_queue.copy()
+        cls.message_queue.clear()
+        return '\n'.join(copy)
+
+    @classmethod
+    def push_message(cls, message):
+        cls.message_queue.append(message)
+
 
 class Filter:
-    __slots__ = ['id', 'name', 'description', 'tfsession']
+    __slots__ = ['id', 'name', 'description', 'predict']
 
-    def __init__(self, id_, name, description, tfsession):
+    def __init__(self, id_, name, description, predict):
         self.id = id_
         self.name = name
         self.description = description
-        self.tfsession = tfsession
-
-    def predict(self, *args, **kwargs):
-        pass
-
-
-filterset_store = Database()
-message_queue_store = Database()
+        self.predict = predict
