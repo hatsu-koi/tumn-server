@@ -76,9 +76,9 @@ at `localhost:5000`
 1. 필터 폴더에 Git 레포지토리를 클론한다.
 2. 필터 폴더 내부의 setup.py를 실행시킨다.
 
-## GET `/filters/:id/messsages`
+## GET `/filterset/messsages`
 **설명**
-해당하는 설치중인 필터셋들의 로그를 출력한다.
+설치중인 필터셋들의 로그를 출력한다.
 
 **요청 파라미터**
 없음
