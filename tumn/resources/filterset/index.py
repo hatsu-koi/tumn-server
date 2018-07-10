@@ -14,7 +14,10 @@ class FilterSetMessage(Resource):
 
 class FilterSetManager(Resource):
     def get(self):
-        return [FilterSet.read_metadata(f) for f in FilterSet.filterset_paths()]
+        return {
+            'filters': [FilterSet.read_metadata(f) for f in FilterSet.filterset_paths()],
+            'messages': FilterSet.pop_messages()
+        }
 
     def post(self):
         args = parser.parse_args()

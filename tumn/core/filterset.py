@@ -3,12 +3,13 @@ from tumn.utils.database import Database
 import os
 import json
 import shutil
+import subprocess
 
 FILTERS_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../filters/'))
 
 
 class FilterSet:
-    __slots__ = ['name', 'path', 'meta', 'isLoaded', 'message_queue', 'filters']
+    __slots__ = ['name', 'path', 'meta', 'isLoaded', 'filters']
     filterset_store = Database()
     message_queue = []
 
@@ -26,14 +27,14 @@ class FilterSet:
             return
 
         FilterSet.filterset_store.iterload([self.name, self.path, self.meta['id']], [self])
-
+        subprocess.Popen('python ' + os.path.join(self.path, 'setup.py'))
         for f in self.meta['options']:
             self.filters[f['id']] = Filter(id_=f['id'],
                                            name=f['name'],
                                            description=f['description'],
                                            predict=None)
 
-        FilterSet.message_queue.append('Filter loaded successful.')
+        FilterSet.push_message('Filter loaded successful.')
 
         self.isLoaded = True
 
@@ -43,9 +44,9 @@ class FilterSet:
 
         class Progress(RemoteProgress):
             def update(self, op_code, cur_count, max_count=None, message=''):
-                cls.message_queue.append(self._cur_line)
+                cls.push_message(self._cur_line)
 
-        cls.message_queue.append('Downloading Filterset...\n'
+        cls.push_message('Downloading Filterset...\n'
                                  'FilterSet detected : {}'.format(name))
 
         return Repo.clone_from(url,
@@ -88,7 +89,7 @@ class FilterSet:
     def pop_messages(cls):
         copy = cls.message_queue.copy()
         cls.message_queue.clear()
-        return '\n'.join(copy)
+        return copy
 
     @classmethod
     def push_message(cls, message):
