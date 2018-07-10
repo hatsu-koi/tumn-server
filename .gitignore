@@ -104,3 +104,8 @@ venv.bak/
 .mypy_cache/
 
 .idea/
+
+
+# Tumn
+tumn/filters/
+!tumn/filters/__init__.py
