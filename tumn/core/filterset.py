@@ -27,11 +27,14 @@ class FilterSet:
 
         FilterSet.filterset_store.iterload([self.name, self.path, self.meta['id']], [self])
 
+        loaded_filter = __import__(os.path.join(self.path, self.meta['entry']))
+        loaded_filter.load()
+
         for f in self.meta['options']:
             self.filters[f['id']] = Filter(id_=f['id'],
                                            name=f['name'],
                                            description=f['description'],
-                                           predict=None)
+                                           predict=loaded_filter.filters[f['id']])
 
         FilterSet.message_queue.append('Filter loaded successful.')
 
