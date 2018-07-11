@@ -1,4 +1,4 @@
-from flask_restful import reqparse, Resource
+from flask_restful import reqparse, Resource, fields, marshal_with
 
 
 parser = reqparse.RequestParser()
@@ -10,4 +10,7 @@ class Query(Resource):
     def post(self):
         args = parser.parse_args()
 
-        return [["miszehbrgbk", [[9, 13], [19, 23]]]]
+        return {
+            "filter": "miszehbrgbk",
+            "index": [[9, 13], [19, 23]]
+        }

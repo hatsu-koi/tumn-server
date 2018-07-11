@@ -135,7 +135,8 @@ at `localhost:5000`
 
 **예시 출력**
 ```json
-[
-  ["miszehbrgbk", [ [9, 13], [19, 23] ]]
-]
+{
+  "filter": "miszehbrgbk",
+  "index": [[9, 13], [19, 23]]
+}
 ```

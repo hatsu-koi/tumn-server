@@ -82,9 +82,13 @@ class FilterSetManager(Resource):
                 "success": False,
                 "message": "Filterset not found."
             }
+        except PermissionError:
+            return {
+                "success": False,
+                "message": "Permission denied."
+            }
         else:
             return {
                 "success": True,
                 "message": "Filterset deleted successful."
             }
-
