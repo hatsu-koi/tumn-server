@@ -75,20 +75,21 @@ class FilterSetManager(Resource):
 
     @marshal_with(delete_filterset_field)
     def delete(self, id_):
+        success = False
+        message = ""
         try:
             FilterSet.delete_filterset(id_)
         except (KeyError, AttributeError):
-            return {
-                "success": False,
-                "message": "Filterset not found."
-            }
+            success = False
+            message = "Filterset not found"
         except PermissionError:
-            return {
-                "success": False,
-                "message": "Permission denied."
-            }
+            success = False
+            message = "Permission denied"
         else:
+            success = True
+            message = "Filterset deleted successful."
+        finally:
             return {
-                "success": True,
-                "message": "Filterset deleted successful."
+                "success": success,
+                "message": message
             }
