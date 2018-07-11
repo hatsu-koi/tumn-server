@@ -3,12 +3,13 @@ from tumn.utils.database import Database
 import os
 import json
 import shutil
+import subprocess
 
-FILTERS_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../filters/'))
+FILTERS_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "../filters/"))
 
 
 class FilterSet:
-    __slots__ = ['name', 'path', 'meta', 'isLoaded', 'message_queue', 'filters']
+    __slots__ = ["name", "path", "meta", "isLoaded", "filters"]
     filterset_store = Database()
     message_queue = []
 
@@ -36,32 +37,35 @@ class FilterSet:
                                            description=f['description'],
                                            predict=loaded_filter.filters[f['id']])
 
-        FilterSet.message_queue.append('Filter loaded successful.')
+        FilterSet.push_message("Filter loaded successful.")
 
         self.isLoaded = True
 
+    def setup(self):
+        subprocess.Popen("python " + os.path.join(self.path, "setup.py"))
+
     @classmethod
     def download_filter(cls, url):
-        name = os.path.basename(url).replace('.git', '')
+        name = os.path.basename(url).replace(".git", "")
 
         class Progress(RemoteProgress):
-            def update(self, op_code, cur_count, max_count=None, message=''):
-                cls.message_queue.append(self._cur_line)
+            def update(self, op_code, cur_count, max_count=None, message=""):
+                cls.push_message(self._cur_line)
 
-        cls.message_queue.append('Downloading Filterset...\n'
-                                 'FilterSet detected : {}'.format(name))
+        cls.push_message("Downloading Filterset...\n"
+                         "FilterSet detected : {}".format(name))
 
         return Repo.clone_from(url,
-                               os.path.join('tumn/filters', name),
+                               os.path.join("tumn/filters", name),
                                progress=Progress())
 
     @classmethod
     def read_metadata(cls, path):
         try:
-            with open(os.path.join(path, 'filterset.json')) as f:
+            with open(os.path.join(path, "filterset.json")) as f:
                 return json.load(f)
         except FileNotFoundError:
-            print('filterset.json not found in {}'.format(path))
+            print("filterset.json not found in {}".format(path))
 
     @classmethod
     def load_filters(cls):
@@ -91,7 +95,7 @@ class FilterSet:
     def pop_messages(cls):
         copy = cls.message_queue.copy()
         cls.message_queue.clear()
-        return '\n'.join(copy)
+        return copy
 
     @classmethod
     def push_message(cls, message):
