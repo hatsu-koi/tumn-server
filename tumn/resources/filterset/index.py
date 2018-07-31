@@ -1,5 +1,6 @@
 from flask_restful import reqparse, Resource, fields, marshal_with
 from tumn.core.filterset import FilterSet
+import re
 import os
 
 parser = reqparse.RequestParser()
@@ -54,7 +55,7 @@ class FilterSetManager(Resource):
         args = parser.parse_args()
 
         try:
-            name = os.path.basename(args["url"]).replace(".git", "")
+            name = re.sub(r"[^a-zA-Z0-9_]", "_", os.path.basename(args["url"]).replace(".git", ""))
             filterset = FilterSet(name)
 
             FilterSet.download_filter(args["url"])

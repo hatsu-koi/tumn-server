@@ -28,14 +28,18 @@ class FilterSet:
 
         FilterSet.filterset_store.iterload([self.name, self.path, self.meta['id']], [self])
 
-        loaded_filter = __import__(os.path.join(self.path, self.meta['entry']))
-        loaded_filter.load()
+        module_path = "tumn.filters.%s.%s" % (self.name, self.meta['entry'])
+        loaded_filter_module = __import__(module_path, fromlist=['filters', 'load'])
+        loaded_filter_module.load()
+        loaded_filters = loaded_filter_module.filters
 
         for f in self.meta['options']:
+            filter_id = f['id'].split('.')[1]
+
             self.filters[f['id']] = Filter(id_=f['id'],
                                            name=f['name'],
                                            description=f['description'],
-                                           predict=loaded_filter.filters[f['id']])
+                                           predict=loaded_filters[filter_id])
 
         FilterSet.push_message("Filter loaded successful.")
 
