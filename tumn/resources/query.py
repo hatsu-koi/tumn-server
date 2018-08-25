@@ -12,8 +12,10 @@ class Query(Resource):
         results = []
 
         for filter in args['filters']:
-            filter_object = FilterSet.filters[filter]
-            results.append(*filter_object.predict(args['text']))
-
+            filter_object = FilterSet.filter_list[filter]
+            output = filter_object.predict(args['text'])
+            
+            if len(output) > 0:
+                results.append(*output)
 
         return results

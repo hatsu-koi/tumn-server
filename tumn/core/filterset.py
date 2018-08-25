@@ -12,6 +12,7 @@ class FilterSet:
     __slots__ = ["name", "path", "meta", "isLoaded", "filters"]
     filterset_store = Database()
     message_queue = []
+    filter_list = {}
 
     def __init__(self, name):
         self.name = name
@@ -34,12 +35,12 @@ class FilterSet:
         loaded_filters = loaded_filter_module.filters
 
         for f in self.meta['options']:
-            filter_id = f['id'].split('.')[1]
-
             self.filters[f['id']] = Filter(id_=f['id'],
                                            name=f['name'],
                                            description=f['description'],
-                                           predict=loaded_filters[filter_id])
+                                           predict=loaded_filters[f['id']])
+
+            FilterSet.filter_list[f['id']] = self.filters[f['id']]
 
         FilterSet.push_message("Filter loaded successful.")
 
