@@ -10,11 +10,18 @@ class Query(Resource):
     def post(self):
         args = parser.parse_args()
         results = []
+        sharedres = {}
 
         for filter in args['filters']:
             filter_object = FilterSet.filter_list[filter]
-            output = filter_object.predict(args['text'])
-            
+            filterset_name = filter_object.parent.name
+
+            if filterset_name in FilterSet.sharedres_list:
+                if not filterset_name in sharedres:
+                    sharedres[filterset_name] = FilterSet.sharedres_list[filterset_name](args['text'])
+
+            output = filter_object.predict(args['text'], sharedres[filterset_name])
+
             if len(output) > 0:
                 results.append(*output)
 

@@ -13,6 +13,7 @@ class FilterSet:
     filterset_store = Database()
     message_queue = []
     filter_list = {}
+    sharedres_list = {}
 
     def __init__(self, name):
         self.name = name
@@ -38,10 +39,15 @@ class FilterSet:
             self.filters[f['id']] = Filter(id_=f['id'],
                                            name=f['name'],
                                            description=f['description'],
+                                           parent=self,
                                            predict=loaded_filters[f['id']])
 
             FilterSet.filter_list[f['id']] = self.filters[f['id']]
 
+        if '__prepare_sharedres' in loaded_filters:
+            FilterSet.sharedres_list[self.name] = loaded_filters['__prepare_sharedres']
+
+        FilterSet.filter_list["%s.__prepare_sharedres" % self.name] = loaded_filters['__prepare_sharedres']
         FilterSet.push_message("Filter loaded successful.")
 
         self.isLoaded = True
@@ -108,10 +114,11 @@ class FilterSet:
 
 
 class Filter:
-    __slots__ = ['id', 'name', 'description', 'predict']
+    __slots__ = ['id', 'name', 'description', 'parent', 'predict']
 
-    def __init__(self, id_, name, description, predict):
+    def __init__(self, id_, name, description, parent, predict):
         self.id = id_
         self.name = name
         self.description = description
         self.predict = predict
+        self.parent = parent
