@@ -1,5 +1,6 @@
 from flask_restful import reqparse, Resource
 from tumn.core.filterset import FilterSet
+import jpype
 
 parser = reqparse.RequestParser()
 parser.add_argument('filters', type=list, location='json')
@@ -8,6 +9,7 @@ parser.add_argument('text', type=list, location='json')
 
 class Query(Resource):
     def post(self):
+        jpype.attachThreadToJVM()
         args = parser.parse_args()
         results = []
         sharedres = {}
