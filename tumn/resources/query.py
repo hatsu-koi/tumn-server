@@ -11,7 +11,7 @@ class Query(Resource):
     def post(self):
         jpype.attachThreadToJVM()
         args = parser.parse_args()
-        results = []
+        results = {}
         sharedres = {}
 
         for filter in args['filters']:
@@ -25,6 +25,10 @@ class Query(Resource):
             output = filter_object.predict(args['text'], sharedres[filterset_name])
 
             if len(output) > 0:
-                results.append(*output)
+                for output_element in output:
+                    if output_element[0] not in results:
+                        results[output_element[0]] = []
 
-        return results
+                    results[output_element[0]].append(output_element[1])
+
+        return results.items()
