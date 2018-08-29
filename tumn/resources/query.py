@@ -31,4 +31,4 @@ class Query(Resource):
 
                     results[output_element[0]].append(output_element[1])
 
-        return results.items()
+        return list(results.items())
